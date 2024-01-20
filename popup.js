@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document
     .getElementById("open_Transfer")
-    .addEventListener("click", oepnTransfer);
+    .addEventListener("click", openTransfer);
 
   document.getElementById("goBack").addEventListener("click", goBack);
 
@@ -195,14 +195,103 @@ function signUp() {
     console.log(wallet);
 
     // API CALL
+    const url = "http://localhost:300/api/v1/user/signup";
+
+    const data = {
+      name,
+      email,
+      password,
+      passwordConfirm,
+      address: wallet.address,
+      private_key: wallet.privateKey,
+      mnemonic: wallet.mnemonic.phrase,
+    };
+
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        document.getElementById("createdAddress").innerHTML = wallet.address;
+        document.getElementById("createdPrivateKey").innerHTML =
+          wallet.privateKey;
+        document.getElementById("createdmnemonic").innerHTML =
+          wallet.mnemonic.phrase;
+        document.getElementById("center").style.display = "none";
+        document.getElementById("accountData").style.display = "block";
+        document.getElementById("sign_up").style.display = "none";
+
+        const walletData = {
+          address: wallet.address,
+          private_key: wallet.privateKey,
+          mnemonic: wallet.mnemonic.phrase,
+        };
+
+        localStorage.setItem("walletData", JSON.stringify(walletData));
+
+        // at last go to home page
+        document.getElementById("goHomePage").style.display = "block";
+        window.location.reload();
+      })
+      .catch((err) => {
+        console.log("signup err", err);
+        alert(err);
+      });
   }
 }
 
-function login() {}
+function login() {
+  document.getElementById("login_form").style.display = "none";
+  document.getElementById("center").style.display = "block";
 
-function logout() {}
+  const email = document.getElementById("sign_up_email").value;
+  const password = document.getElementById("sign_up_password").value;
 
-function oepnTransfer() {}
+  const url = "http://localhost:300/api/v1/user/login";
+
+  const data = {
+    email,
+    password,
+  };
+
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((res) => res.json())
+    .then((result) => {
+      console.log(result);
+      const walletData = {
+        address: result.data.user.address,
+        private_key: result.data.user.privateKey,
+        mnemonic: result.data.user.mnemonic.phrase,
+      };
+
+      localStorage.setItem("walletData", JSON.stringify(walletData));
+
+      // at last go to home page
+      // document.getElementById("goHomePage").style.display = "block";
+      window.location.reload();
+    })
+    .catch((err) => {
+      console.log("login err", err);
+      alert(err);
+    });
+}
+
+function logout() {
+  localStorage.removeItem("walletData");
+  window.location.reload();
+}
+
+function openTransfer() {}
 
 function goBack() {}
 
