@@ -404,7 +404,20 @@ function addAccount() {
     });
 }
 
-function myFunction() {}
+function myFunction() {
+  const data = localStorage.getItem("walletData");
+  const parsedData = JSON.parse(data);
+
+  if (parsedData.address) {
+    document.getElementById("LoginUser").style.display = "none";
+    document.getElementById("home").style.display = "block";
+
+    privateKey = parsedData.private_key;
+    address = parsedData.address;
+
+    checkBalance(parsedData.address);
+  }
+}
 
 function copyAddress() {}
 
