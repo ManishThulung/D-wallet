@@ -417,8 +417,92 @@ function myFunction() {
 
     checkBalance(parsedData.address);
   }
+
+  const tokenRender = document.querySelector(".assets");
+  const accountRender = document.querySelector(".accountList");
+
+  const url1 = "http://localhost:3000/api/v1/tokens/all-token";
+
+  fetch(url1)
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+
+      let elements = "";
+
+      data?.data?.tokens?.map(
+        (token) =>
+          (elements += `
+      <div class="assets_item>
+      <img
+      class="assets_item_img"
+      src="./assets/theblockchaincoders.png"
+      alt=""
+      />
+
+      <span>${token.address.slice(0, 15)}...</span>
+      <span>${token.symbol}</span>
+
+      </div>
+      `)
+      );
+
+      tokenRender.innerHTML = elements;
+    })
+    .catch((err) => {
+      console.log("my func", err);
+      alert(err);
+    });
+
+  const url2 = "http://localhost:3000/api/v1/accounts/all-account";
+  fetch(url2)
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+
+      let accounts = "";
+
+      data?.data?.accounts?.map(
+        (account, i) =>
+          (accounts += `
+      <div class="lists>
+      <p>${i + 1}</p>
+      <p class"accountValue" data-address=${account.address} data-privateKey=${
+            account.privateKey
+          }>${account.address.slice(0, 15)}...</p>
+      </div>
+      `)
+      );
+
+      accountRender.innerHTML = accounts;
+    })
+    .catch((err) => {
+      console.log("my func", err);
+      alert(err);
+    });
 }
 
-function copyAddress() {}
+function copyAddress() {
+  navigator.clipboard.writeText(address);
+}
 
-function changeAccount() {}
+function changeAccount() {
+  const data = document.querySelector(".accountValue");
+  const address = data.getAttribute("data-address");
+  const privateKey = data.getAttribute("data-privateKey");
+  console.log(address, "address");
+  console.log(privateKey, "privateKey");
+
+  const userWallet = {
+    address,
+    private_key: privateKey,
+    mnemonic: "Changed",
+  };
+
+  localStorage.setItem("walletData", JSON.stringify(userWallet));
+
+  window.location.reload();
+}
+
+// whenever the extension is open load this funcation first time
+window.onload = myFunction;
